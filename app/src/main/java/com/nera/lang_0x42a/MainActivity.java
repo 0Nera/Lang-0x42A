@@ -162,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
                                 "\nЕсли метки нет, программа аварийно завершится" +
                                 "\nJ - Переход на следующую метку"/* +
                                 "\nP - Отправить данные" +
-                                "\nI - Запустить "*/);
+                                "\nI - Запустить "*/
+                );
                 dia.create().show();
             }
         });

@@ -12,14 +12,16 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:orientation="horizontal">
+
         <Button
             android:id="@+id/button_run"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:insetRight="25dp"
             android:padding="8dp"
             android:text="Выполнить"
-            android:textSize="12sp"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
         <Button
             android:id="@+id/button_info"
             android:layout_width="wrap_content"
@@ -80,14 +82,15 @@
                 android:text="Вывод"
                 android:textSize="12sp"
                 android:textColor="#FFFFFF" />
+
             <TextView
                 android:id="@+id/textview1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="TextView"
-                android:textSize="12sp"
-                android:textColor="#FF0000" />
+                android:text="Отладка"
+                android:textColor="#FF0000"
+                android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
