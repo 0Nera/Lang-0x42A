@@ -8,6 +8,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Lang0x42A">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2367458675766604~8469297247"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -17,6 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
+        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
 
+    </application>
 </manifest>

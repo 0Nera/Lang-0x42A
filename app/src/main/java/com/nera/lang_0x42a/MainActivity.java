@@ -1,11 +1,13 @@
 package com.nera.lang_0x42a;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,12 +15,18 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
     private Timer _timer = new Timer();
+    private InterstitialAd mInterstitialAd;
 
     private String programm = "";
     private String parsing = "";
@@ -67,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
         button_run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
+                if (mInterstitialAd != null) {
+                    mInterstitialAd.show(MainActivity.this);
+                }
                 button_run.setVisibility(View.GONE);
                 edit_programm.setVisibility(View.GONE);
                 textview_output.setText("");
@@ -102,6 +113,24 @@ public class MainActivity extends AppCompatActivity {
                 };
                 _timer.scheduleAtFixedRate(t, (int)(0), (int)(10));
             }
+        });
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        InterstitialAd.load(this,"ca-app-pub-2367458675766604/9677587076", adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        mInterstitialAd = interstitialAd;
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        mInterstitialAd = null;
+                    }
         });
 
         button_info.setOnClickListener(new View.OnClickListener() {
