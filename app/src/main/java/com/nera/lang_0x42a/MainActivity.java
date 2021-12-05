@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String programm = "";
     private String parsing = "";
-    private double col = 0;
-    private double parsed = 0;
+    private int col = 0;
+    private int parsed = 0;
     private static int max_size = 64000;
     private static int[] memory = new int[max_size];
     private static int[] saved_memory = new int[max_size];;
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 if (run) {
                                     if (!((parsed + 1) > parsing.length())) {
-                                        _execute(parsing.substring((int)(parsed), (int)(parsed + 1)));
+                                        _execute(parsing.substring(parsed, parsed + 1));
                                         parsed++;
                                     }
                                     else {
@@ -141,31 +141,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View _view) {
                 dia.setTitle("Справка");
                 dia.setMessage(
-                        "Язык Ъ является тьюринг-полным эзотерическим языком программирования, " +
-                                "разработанный Елчинян Ареном в 2021 году." +
-                        "\n\nИмеет 64000 ячеек памяти\n\nИнструкции языка Ъ:" +
-                                "\n+ - Увеличить значение в ячейке" +
-                                "\n- - Уменьшить значение в ячейке" +
-                                "\n> - Перейти на следующую ячейку" +
-                                "\n< - Перейти на предыдущую ячейку" +
-                                "\n[ - (цикл) если значение текущей ячейки ноль," +
-                                " перейти вперёд по тексту программы на ячейку," +
-                                " следующую за соответствующей ] (с учётом вложенности)" +
-                                "\n] - Конец цикла" +
-                                "\n. - Вывод текущей ячейки" +
-                                "\n, - Ввод одного символа" +
-                                "\n~ - Отладочный символ" +
-                                "S - Сохранить состояние памяти" +
-                                "\nL - Загрузить память" +
-                                "\nQ - Вывести исходный код программы" +
-                                "\nD - Debug режим" +
-                                "\nE - Выход из программы" +
-                                "\nC - Очистить память" +
-                                "\n$ - Метка, программа перейдет на неё при команде J." +
-                                "\nЕсли метки нет, программа аварийно завершится" +
-                                "\nJ - Переход на следующую метку"/* +
-                                "\nP - Отправить данные" +
-                                "\nI - Запустить "*/
+                        getString(R.string.InfoRu)
                 );
                 dia.create().show();
             }
@@ -180,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     String temp_str = edit_input_char.getText().toString();
                     char temp_char_array[] = temp_str.toCharArray();
                     char temp_char = temp_char_array[0];
-                    memory[(int)col] = (int)temp_char;
+                    memory[col] = temp_char;
                 }
             }
         });
@@ -283,11 +259,17 @@ public class MainActivity extends AppCompatActivity {
     public void _execute_nbf(final String _c) {
         switch(_c) {
             case "+": {
-                memory[(int)col]++;
+                memory[col]++;
+                if (memory[col] == 65537) {
+                    col = 0;
+                }
                 break;
             }
             case "-": {
-                memory[(int)col]--;
+                memory[col]--;
+                if (memory[col] == -1) {
+                    col = 65536;
+                }
                 break;
             }
             case ">": {
@@ -299,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case ".": {
-                String temp_str = String.valueOf((char)(memory[(int)col]));
+                String temp_str = String.valueOf((char)(memory[col]));
                 textview_output.setText(textview_output.getText().toString().concat(temp_str));
                 break;
             }
@@ -314,17 +296,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case "C": {
-                memory = new int[64000];
+                memory = new int[max_size];
                 break;
             }
             case "[": {
-                if (memory[(int)col] == 0) {
+                if (memory[col] == 0) {
                     parsed++;
-                    while((c > 0) || !parsing.substring((int)(parsed), (int)(parsed + 1)).equals("]")) {
-                        if (parsing.substring((int)(parsed), (int)(parsed + 1)).equals("[")) {
+                    while((c > 0) || parsing.charAt(parsed) != ']') {
+                        if (parsing.charAt(parsed) == '[') {
                             c++;
                         }
-                        if (parsing.substring((int)(parsed), (int)(parsed + 1)).equals("]")) {
+                        if (parsing.charAt(parsed) == ']') {
                             c--;
                         }
                         parsed++;
@@ -333,13 +315,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case "]": {
-                if (!(memory[(int)col] == 0)) {
+                if (!(memory[col] == 0)) {
                     parsed--;
-                    while((c > 0) || !parsing.substring((int)(parsed), (int)(parsed + 1)).equals("[")) {
-                        if (parsing.substring((int)(parsed), (int)(parsed + 1)).equals("]")) {
+                    while((c > 0) || parsing.charAt(parsed) != '[') {
+                        if (parsing.charAt(parsed) == ']') {
                             c++;
                         }
-                        if (parsing.substring((int)(parsed), (int)(parsed + 1)).equals("[")) {
+                        if (parsing.charAt(parsed) == '[') {
                             c--;
                         }
                         parsed--;
