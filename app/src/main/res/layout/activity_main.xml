@@ -26,8 +26,18 @@
             android:id="@+id/button_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:insetRight="25dp"
             android:padding="8dp"
             android:text="Справка"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF" />
+        <Button
+            android:id="@+id/button_sample"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:insetRight="25dp"
+            android:padding="8dp"
+            android:text="Пример"
             android:textSize="12sp"
             android:textColor="#FFFFFF" />
     </LinearLayout>
@@ -84,7 +94,7 @@
                 android:textColor="#FFFFFF" />
 
             <TextView
-                android:id="@+id/textview1"
+                android:id="@+id/textview_debug"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"

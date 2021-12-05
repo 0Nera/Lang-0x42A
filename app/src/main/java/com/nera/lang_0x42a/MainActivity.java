@@ -32,22 +32,24 @@ public class MainActivity extends AppCompatActivity {
     private String parsing = "";
     private double col = 0;
     private double parsed = 0;
-    private  static byte[] memory = new byte[64000];;
+    private static int max_size = 64000;
+    private  static byte[] memory = new byte[max_size];
+    private  static byte[] saved_memory = new byte[max_size];;
     private boolean run = false;
     private boolean debug = false;
     private double c = 0;
-    private boolean NeraMath_isActive = false;
 
     private LinearLayout linear_menu;
     private ScrollView vscroll_main;
     private Button button_run;
     private Button button_info;
+    private Button button_enter;
+    private Button button_sample;
     private LinearLayout linear_main;
     private EditText edit_programm;
     private LinearLayout linear_input;
     private TextView textview_output;
-    private TextView textview1;
-    private Button button_enter;
+    private TextView textview_debug;
     private EditText edit_input_char;
 
     private TimerTask t;
@@ -62,12 +64,13 @@ public class MainActivity extends AppCompatActivity {
         vscroll_main = findViewById(R.id.vscroll_main);
         button_run = findViewById(R.id.button_run);
         button_info = findViewById(R.id.button_info);
+        button_sample = findViewById(R.id.button_sample);
+        button_enter = findViewById(R.id.button_enter);
         linear_main = findViewById(R.id.linear_main);
         edit_programm = findViewById(R.id.edit_programm);
         linear_input = findViewById(R.id.linear_input);
         textview_output = findViewById(R.id.textview_output);
-        textview1 = findViewById(R.id.textview1);
-        button_enter = findViewById(R.id.button_enter);
+        textview_debug = findViewById(R.id.textview_debug);
         edit_input_char = findViewById(R.id.edit_input_char);
         dia = new AlertDialog.Builder(this);
         linear_input.setVisibility(View.GONE);
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 button_run.setVisibility(View.GONE);
                 edit_programm.setVisibility(View.GONE);
                 textview_output.setText("");
-                textview1.setText("");
+                textview_debug.setText("");
                 col = 0;
                 parsed = 0;
                 programm = edit_programm.getText().toString().trim();
@@ -151,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
                                 "\n] - Конец цикла" +
                                 "\n. - Вывод текущей ячейки" +
                                 "\n, - Ввод одного символа" +
-                                "\n~ - Отладочный символ"/* +
-                                "\nS - Сохранить состояние памяти" +
-                                "\nL - Загрузить память" */+
+                                "\n~ - Отладочный символ" +
+                                "S - Сохранить состояние памяти" +
+                                "\nL - Загрузить память" +
                                 "\nQ - Вывести исходный код программы" +
                                 "\nD - Debug режим" +
                                 "\nE - Выход из программы" +
@@ -182,6 +185,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        button_sample.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View _view) {
+                edit_programm.setText(
+                        getString(R.string.SampleHelloWorld)
+                       );
+            }
+        });
+
 
     }
 
@@ -193,34 +205,46 @@ public class MainActivity extends AppCompatActivity {
         switch(_c) {
             case "D": {
                 if (debug) {
-                    textview1.setText(textview1.getText().toString().concat("\nОтладка отключена\n"));
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nОтладка отключена\n"));
                 }
                 else {
-                    textview1.setText(textview1.getText().toString().concat("\nОтладка включена\n"));
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nОтладка включена\n"));
                 }
                 debug = !debug;
                 break;
             }
             case "~": {
                 if (debug) {
-                    textview1.setText(textview1.getText().toString().concat("~"));
+                    textview_debug.setText(textview_debug.getText().toString().concat("~"));
                 }
                 break;
             }
             case "P": {
-
+                // todo
+                if (debug) {
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nPush\n"));
+                }
                 break;
             }
             case "I": {
-
+                // todo
+                if (debug) {
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nExec\n"));
+                }
                 break;
             }
             case "S": {
-
+                if (debug) {
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nSaved\n"));
+                }
+                saved_memory = memory.clone();
                 break;
             }
             case "L": {
-
+                if (debug) {
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nLoaded\n"));
+                }
+                memory = saved_memory.clone();
                 break;
             }
             case "E": {
@@ -234,17 +258,17 @@ public class MainActivity extends AppCompatActivity {
                 if (parsing.substring((int)(parsed), (int)(parsing.length())).contains("$")) {
                     parsed = parsing.substring((int)(parsed), (int)(parsing.length())).indexOf("$");
                     if (debug) {
-                        textview1.setText(textview1.getText().toString().concat("\nПереход на метку\n"));
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nПереход на метку\n"));
                     }
                 }
                 else {
-                    textview1.setText(textview1.getText().toString().concat("\nОшибка! Метка не найдена\n"));
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nОшибка! Метка не найдена\n"));
                 }
                 break;
             }
             case "$": {
                 if (debug) {
-                    textview1.setText(textview1.getText().toString().concat("\nМетка\n"));
+                    textview_debug.setText(textview_debug.getText().toString().concat("\nМетка\n"));
                 }
                 break;
             }
@@ -326,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
             }
             default: {
                 if (debug) {
-                    textview1.setText(textview1.getText().toString().concat(_c));
+                    textview_debug.setText(textview_debug.getText().toString().concat(_c));
                 }
                 break;
             }
