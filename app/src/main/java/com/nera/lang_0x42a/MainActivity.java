@@ -5,9 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,12 +18,12 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
-import java.util.Timer;
+
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Timer _timer = new Timer();
+
     private InterstitialAd mInterstitialAd;
 
     private String programm = "";
@@ -39,34 +37,45 @@ public class MainActivity extends AppCompatActivity {
     private boolean debug = false;
     private double c = 0;
 
-    private LinearLayout linear_menu;
-    private ScrollView vscroll_main;
     private Button button_run;
-    private Button button_info;
-    private Button button_enter;
-    private Button button_sample;
-    private LinearLayout linear_main;
     private EditText edit_programm;
     private LinearLayout linear_input;
     private TextView textview_output;
     private TextView textview_debug;
     private EditText edit_input_char;
 
-    private TimerTask t;
     private AlertDialog.Builder dia;
+
+    public void run_task(){
+        try {
+            while (run) {
+                if (!((parsed + 1) > parsing.length())) {
+                    _execute(parsing.substring(parsed, parsed + 1));
+                    parsed++;
+                } else {
+                    run = false;
+                    button_run.setVisibility(View.VISIBLE);
+                    edit_programm.setVisibility(View.VISIBLE);
+                    textview_debug.setText(String.format("%s\n Программа завершена", textview_debug.getText()));
+                }
+            }
+        } catch (Exception E){
+            textview_debug.setText(String.format("%s\n ERROR: %s", textview_debug.getText(), E.toString()));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        linear_menu = findViewById(R.id.linear_menu);
-        vscroll_main = findViewById(R.id.vscroll_main);
+        LinearLayout linear_menu = findViewById(R.id.linear_menu);
+        ScrollView vscroll_main = findViewById(R.id.vscroll_main);
         button_run = findViewById(R.id.button_run);
-        button_info = findViewById(R.id.button_info);
-        button_sample = findViewById(R.id.button_sample);
-        button_enter = findViewById(R.id.button_enter);
-        linear_main = findViewById(R.id.linear_main);
+        Button button_info = findViewById(R.id.button_info);
+        Button button_sample = findViewById(R.id.button_sample);
+        Button button_enter = findViewById(R.id.button_enter);
+        LinearLayout linear_main = findViewById(R.id.linear_main);
         edit_programm = findViewById(R.id.edit_programm);
         linear_input = findViewById(R.id.linear_input);
         textview_output = findViewById(R.id.textview_output);
@@ -92,35 +101,14 @@ public class MainActivity extends AppCompatActivity {
                 run = true;
                 debug = false;
                 memory = new int[64000];
-                t = new TimerTask() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (run) {
-                                    if (!((parsed + 1) > parsing.length())) {
-                                        _execute(parsing.substring(parsed, parsed + 1));
-                                        parsed++;
-                                    }
-                                    else {
-                                        run = false;
-                                        button_run.setVisibility(View.VISIBLE);
-                                        edit_programm.setVisibility(View.VISIBLE);
-                                        t.cancel();
-                                    }
-                                }
-                            }
-                        });
-                    }
-                };
-                _timer.scheduleAtFixedRate(t, (int)(0), (int)(10));
+                run_task();
+
             }
         });
 
         AdRequest adRequest = new AdRequest.Builder().build();
 
-        InterstitialAd.load(this,"ca-app-pub-2367458675766604/9677587076", adRequest,
+        InterstitialAd.load(this,getString(R.string.i_ads), adRequest,
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
@@ -151,12 +139,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View _view) {
                 if (!(edit_input_char.getText().toString().equals(""))) {
-                    run = true;
-                    linear_input.setVisibility(View.GONE);
-                    String temp_str = edit_input_char.getText().toString();
-                    char temp_char_array[] = temp_str.toCharArray();
-                    char temp_char = temp_char_array[0];
-                    memory[col] = temp_char;
+                    try{
+                        run = true;
+                        linear_input.setVisibility(View.GONE);
+                        String temp_str = edit_input_char.getText().toString();
+                        char temp_char_array[] = temp_str.toCharArray();
+                        char temp_char = temp_char_array[0];
+                        memory[col] = temp_char;
+                        run_task();
+                    } catch (Exception E){
+                        textview_debug.setText(String.format("%s\n ERROR: %s", textview_debug.getText(), E.toString()));
+                    }
                 }
             }
         });
@@ -178,164 +171,178 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void _execute(final String _c) {
-        switch(_c) {
-            case "D": {
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nОтладка отключена\n"));
-                }
-                else {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nОтладка включена\n"));
-                }
-                debug = !debug;
-                break;
-            }
-            case "~": {
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat("~"));
-                }
-                break;
-            }
-            case "P": {
-                // todo
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nPush\n"));
-                }
-                break;
-            }
-            case "I": {
-                // todo
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nExec\n"));
-                }
-                break;
-            }
-            case "S": {
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nSaved\n"));
-                }
-                saved_memory = memory.clone();
-                break;
-            }
-            case "L": {
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nLoaded\n"));
-                }
-                memory = saved_memory.clone();
-                break;
-            }
-            case "E": {
-                run = false;
-                button_run.setVisibility(View.VISIBLE);
-                edit_programm.setVisibility(View.VISIBLE);
-                t.cancel();
-                break;
-            }
-            case "J": {
-                if (parsing.substring((int)(parsed), (int)(parsing.length())).contains("$")) {
-                    parsed = parsing.substring((int)(parsed), (int)(parsing.length())).indexOf("$");
+        try {
+            switch (_c) {
+                case "D": {
                     if (debug) {
-                        textview_debug.setText(textview_debug.getText().toString().concat("\nПереход на метку\n"));
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nОтладка отключена\n"));
+                    } else {
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nОтладка включена\n"));
                     }
+                    debug = !debug;
+                    break;
                 }
-                else {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nОшибка! Метка не найдена\n"));
+                case "~": {
+                    if (debug) {
+                        textview_debug.setText(textview_debug.getText().toString().concat("~"));
+                    }
+                    break;
                 }
-                break;
-            }
-            case "$": {
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat("\nМетка\n"));
+                case "P": {
+                    // todo
+                    if (debug) {
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nPush\n"));
+                    }
+                    break;
                 }
-                break;
+                case "I": {
+                    // todo
+                    if (debug) {
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nExec\n"));
+                    }
+                    break;
+                }
+                case "S": {
+                    if (debug) {
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nSaved\n"));
+                    }
+                    saved_memory = memory.clone();
+                    break;
+                }
+                case "L": {
+                    if (debug) {
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nLoaded\n"));
+                    }
+                    memory = saved_memory.clone();
+                    break;
+                }
+                case "E": {
+                    run = false;
+                    button_run.setVisibility(View.VISIBLE);
+                    edit_programm.setVisibility(View.VISIBLE);
+                    break;
+                }
+                case "J": {
+                    if (parsing.substring(parsed, (int) parsing.length()).contains("$")) {
+                        parsed = parsing.substring(parsed, (int) parsing.length()).indexOf("$");
+                        if (debug) {
+                            textview_debug.setText(textview_debug.getText().toString().concat("\nПереход на метку\n"));
+                        }
+                    } else {
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nОшибка! Метка не найдена\n"));
+                    }
+                    break;
+                }
+                case "$": {
+                    if (debug) {
+                        textview_debug.setText(textview_debug.getText().toString().concat("\nМетка\n"));
+                    }
+                    break;
+                }
+                default: {
+                    _execute_nbf(_c);
+                    break;
+                }
             }
-            default: {
-                _execute_nbf(_c);
-                break;
-            }
+        } catch (Exception E){
+            textview_debug.setText(String.format("%s\n ERROR: %s", textview_debug.getText(), E.toString()));
         }
     }
 
 
     public void _execute_nbf(final String _c) {
-        switch(_c) {
-            case "+": {
-                memory[col]++;
-                if (memory[col] == 65537) {
-                    col = 0;
-                }
-                break;
-            }
-            case "-": {
-                memory[col]--;
-                if (memory[col] == -1) {
-                    col = 65536;
-                }
-                break;
-            }
-            case ">": {
-                col++;
-                break;
-            }
-            case "<": {
-                col--;
-                break;
-            }
-            case ".": {
-                String temp_str = String.valueOf((char)(memory[col]));
-                textview_output.setText(textview_output.getText().toString().concat(temp_str));
-                break;
-            }
-            case ",": {
-                run = false;
-                edit_input_char.setText("");
-                linear_input.setVisibility(View.VISIBLE);
-                break;
-            }
-            case "Q": {
-                textview_output.setText(textview_output.getText().toString().concat(programm));
-                break;
-            }
-            case "C": {
-                memory = new int[max_size];
-                break;
-            }
-            case "[": {
-                if (memory[col] == 0) {
-                    parsed++;
-                    while((c > 0) || parsing.charAt(parsed) != ']') {
-                        if (parsing.charAt(parsed) == '[') {
-                            c++;
-                        }
-                        if (parsing.charAt(parsed) == ']') {
-                            c--;
-                        }
-                        parsed++;
+        try {
+            switch(_c) {
+                case "+": {
+                    memory[col]++;
+                    if (memory[col] == 65537) {
+                        memory[col] = 0;
                     }
+                    break;
                 }
-                break;
-            }
-            case "]": {
-                if (!(memory[col] == 0)) {
-                    parsed--;
-                    while((c > 0) || parsing.charAt(parsed) != '[') {
-                        if (parsing.charAt(parsed) == ']') {
-                            c++;
+                case "-": {
+                    memory[col]--;
+                    if (memory[col] < 0) {
+                        memory[col] = 65536;
+                    }
+                    break;
+                }
+                case ">": {
+                    col++;
+                    if (col == max_size) {
+                        col = 0;
+                    }
+                    break;
+                }
+                case "<": {
+                    col--;
+                    if (col < 0) {
+                        col = max_size;
+                    }
+                    break;
+                }
+                case ".": {
+                    String temp_str = String.valueOf((char)(memory[col]));
+                    textview_output.setText(textview_output.getText().toString().concat(temp_str));
+                    break;
+                }
+                case ",": {
+                    run = false;
+                    edit_input_char.setText("");
+                    linear_input.setVisibility(View.VISIBLE);
+                    break;
+                }
+                case "Q": {
+                    textview_output.setText(textview_output.getText().toString().concat(programm));
+                    break;
+                }
+                case "C": {
+                    memory = new int[max_size];
+                    break;
+                }
+                case "[": {
+
+                    if (memory[col] == 0) {
+                        parsed++;
+                        while((c > 0) || parsing.charAt(parsed) != ']') {
+                            if (parsing.charAt(parsed) == '[') {
+                                c++;
+                            }
+                            if (parsing.charAt(parsed) == ']') {
+                                c--;
+                            }
+                            parsed++;
                         }
-                        if (parsing.charAt(parsed) == '[') {
-                            c--;
+                    }
+                    break;
+                }
+                case "]": {
+
+                    if (!(memory[col] == 0)) {
+                        parsed--;
+                        while((c > 0) || parsing.charAt(parsed) != '[') {
+                            if (parsing.charAt(parsed) == ']') {
+                                c++;
+                            }
+                            if (parsing.charAt(parsed) == '[') {
+                                c--;
+                            }
+                            parsed--;
                         }
                         parsed--;
                     }
-                    parsed--;
+                    Thread.sleep(1);
+                    break;
                 }
-                break;
-            }
-            default: {
-                if (debug) {
-                    textview_debug.setText(textview_debug.getText().toString().concat(_c));
+                default: {
+                    if (debug) {
+                        textview_debug.setText(textview_debug.getText().toString().concat(_c));
+                    }
+                    break;
                 }
-                break;
             }
+        } catch (Exception E){
+            textview_debug.setText(String.format("%s\n ERROR: %s", textview_debug.getText(), E.toString()));
         }
     }
 
