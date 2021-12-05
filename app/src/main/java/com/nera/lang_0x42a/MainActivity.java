@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private double col = 0;
     private double parsed = 0;
     private static int max_size = 64000;
-    private  static byte[] memory = new byte[max_size];
-    private  static byte[] saved_memory = new byte[max_size];;
+    private static int[] memory = new int[max_size];
+    private static int[] saved_memory = new int[max_size];;
     private boolean run = false;
     private boolean debug = false;
     private double c = 0;
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 parsing = programm;
                 run = true;
                 debug = false;
-                memory = new byte[64000];
+                memory = new int[64000];
                 t = new TimerTask() {
                     @Override
                     public void run() {
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     String temp_str = edit_input_char.getText().toString();
                     char temp_char_array[] = temp_str.toCharArray();
                     char temp_char = temp_char_array[0];
-                    memory[(int)col] = (byte)temp_char;
+                    memory[(int)col] = (int)temp_char;
                 }
             }
         });
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case "C": {
-                memory = new byte[64000];
+                memory = new int[64000];
                 break;
             }
             case "[": {
