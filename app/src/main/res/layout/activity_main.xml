@@ -101,6 +101,15 @@
                 android:text="Отладка"
                 android:textColor="#FF0000"
                 android:textSize="12sp" />
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                app:adSize="BANNER"
+                app:adUnitId="@string/b_ads"></com.google.android.gms.ads.AdView>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

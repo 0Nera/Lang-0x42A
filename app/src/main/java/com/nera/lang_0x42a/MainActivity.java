@@ -1,11 +1,6 @@
 package com.nera.lang_0x42a;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,13 +8,17 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
-
-import java.util.TimerTask;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,22 +44,39 @@ public class MainActivity extends AppCompatActivity {
     private EditText edit_input_char;
 
     private AlertDialog.Builder dia;
+    private AdView mAdView;
+
+    Random random = new Random();
+
+    //private Timer timer= new Timer();
+
+    private static boolean isDigit(String s) throws NumberFormatException {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
     public void run_task(){
         try {
-            while (run) {
-                if (!((parsed + 1) > parsing.length())) {
-                    _execute(parsing.substring(parsed, parsed + 1));
-                    parsed++;
-                } else {
-                    run = false;
-                    button_run.setVisibility(View.VISIBLE);
-                    edit_programm.setVisibility(View.VISIBLE);
-                    textview_debug.setText(String.format("%s\n Программа завершена", textview_debug.getText()));
-                }
-            }
+                    while (run) {
+                        if (!((parsed + 1) > parsing.length())) {
+                            _execute(parsing.substring(parsed, parsed + 1));
+                            parsed++;
+                        } else {
+                            run = false;
+                            button_run.setVisibility(View.VISIBLE);
+                            edit_programm.setVisibility(View.VISIBLE);
+                            textview_debug.setText(String.format("%s\n Программа завершена", textview_debug.getText()));
+                        }
+                    }
+                    ;
         } catch (Exception E){
             textview_debug.setText(String.format("%s\n ERROR: %s", textview_debug.getText(), E.toString()));
+            button_run.setVisibility(View.VISIBLE);
+            edit_programm.setVisibility(View.VISIBLE);
         }
     }
 
@@ -84,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
         dia = new AlertDialog.Builder(this);
         linear_input.setVisibility(View.GONE);
 
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         button_run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
@@ -106,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        AdRequest adRequest = new AdRequest.Builder().build();
 
         InterstitialAd.load(this,getString(R.string.i_ads), adRequest,
                 new InterstitialAdLoadCallback() {
@@ -147,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                         char temp_char = temp_char_array[0];
                         memory[col] = temp_char;
                         run_task();
+
                     } catch (Exception E){
                         textview_debug.setText(String.format("%s\n ERROR: %s", textview_debug.getText(), E.toString()));
                     }
@@ -255,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
             switch(_c) {
                 case "+": {
                     memory[col]++;
-                    if (memory[col] == 65537) {
+                    if (memory[col] > 1024) {
                         memory[col] = 0;
                     }
                     break;
@@ -263,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
                 case "-": {
                     memory[col]--;
                     if (memory[col] < 0) {
-                        memory[col] = 65536;
+                        memory[col] = 1024;
                     }
                     break;
                 }
@@ -320,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (!(memory[col] == 0)) {
                         parsed--;
-                        while((c > 0) || parsing.charAt(parsed) != '[') {
+                        while ((c > 0) || parsing.charAt(parsed) != '[') {
                             if (parsing.charAt(parsed) == ']') {
                                 c++;
                             }
@@ -331,11 +351,31 @@ public class MainActivity extends AppCompatActivity {
                         }
                         parsed--;
                     }
-                    Thread.sleep(1);
+                    break;
+                }
+                case "0": {
+                    memory[col] = 0;
+                    break;
+                }
+                case "e": {
+                    String temp_str = String.valueOf((char)(memory[col]));
+                    _execute_nbf(temp_str);
+                    break;
+                }
+                case "r": {
+                    memory[col] = random.nextInt(1024);
                     break;
                 }
                 default: {
-                    if (debug) {
+
+                    if (isDigit(_c)){
+                        memory[col] = Integer.parseInt(_c);;
+                        if (memory[col] < 0) {
+                            memory[col] = 1024;
+                        } else if (memory[col] > 1024){
+                            memory[col] = 0;
+                        }
+                    } else if (debug) {
                         textview_debug.setText(textview_debug.getText().toString().concat(_c));
                     }
                     break;
